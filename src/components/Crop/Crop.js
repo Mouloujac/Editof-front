@@ -24,7 +24,7 @@ function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
   return centerCrop(mediaWidth, mediaHeight, aspect);
 }
 
-export default function Crop({onCropChange, imgSrc}) {
+export default function Crop({onCropChange, imgSrc, fileName}) {
   
   const previewCanvasRef = useRef(null);
   const imgRef = useRef(null);
@@ -34,10 +34,11 @@ export default function Crop({onCropChange, imgSrc}) {
   const [completedCrop, setCompletedCrop] = useState();
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
-  const [aspect, setAspect] = useState(16 / 9);
+  const [aspect, setAspect] = useState(undefined);
   const [isSepia, setIsSepia] = useState(false);
   const [isBlackAndWhite, setIsBlackAndWhite] = useState(false);
   const [newImage, setNewImage] = useState()
+  
 
   const toggleSepia = () => {
     setIsSepia(!isSepia);
@@ -59,109 +60,20 @@ export default function Crop({onCropChange, imgSrc}) {
     transform: `scale(${scale}) rotate(${rotate}deg)`
   };
 
-
-
-
-
-
-
-  const applySepia = () => {
-    if (imgSrc) {
-      if (isSepia == true){
-      // Extract base64-encoded image data
-      const base64Image = newImage.split(",")[1];
-  
-      // Send the image data to the server using axios
-      axios
-        .post("http://localhost:8000/applySepia", {
-          imageData: base64Image,
-        }, {
-          responseType: 'blob', // Set the response type to blob
-        })
-        .then((response) => {
-          // Create a blob from the response data
-          const blob = new Blob([response.data], { type: response.headers['content-type'] });
-  
-          // Create a link element
-          const link = document.createElement('a');
-          link.href = window.URL.createObjectURL(blob);
-  
-          // Set the download attribute with the desired file name
-          link.download = 'modified_image.jpg';
-  
-          // Append the link to the document
-          document.body.appendChild(link);
-  
-          // Trigger a click on the link to initiate the download
-          link.click();
-  
-          // Remove the link from the document
-          document.body.removeChild(link);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-      }
-      if (isBlackAndWhite == true){
-        const base64Image = imgSrc.split(",")[1];
-  
-      // Send the image data to the server using axios
-      axios
-        .post("http://localhost:8000/applyBlackAndWhite", {
-          imageData: base64Image,
-        }, {
-          responseType: 'blob', // Set the response type to blob
-        })
-        .then((response) => {
-          // Create a blob from the response data
-          const blob = new Blob([response.data], { type: response.headers['content-type'] });
-          console.log(blob)
-          // Create a link element
-          const link = document.createElement('a');
-          link.href = window.URL.createObjectURL(blob);
-  
-          // Set the download attribute with the desired file name
-          link.download = 'modified_image.jpg';
-  
-          // Append the link to the document
-          document.body.appendChild(link);
-  
-          // Trigger a click on the link to initiate the download
-          link.click();
-  
-          // Remove the link from the document
-          document.body.removeChild(link);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-      }
-    }
-  };
-
-
-
-
-
-
-
-
-
-  // crop 
+  const aspectOptions = [
+    { label: "Libre", value: undefined },
+    { label: "16:9", value: 16 / 9 },
+    { label: "1:1", value: 1 },
+    
+    // Ajoutez d'autres options d'aspect au besoin
+  ];
 
   function onImageLoad(e) {
-    if (aspect) {
       const { width, height } = e.currentTarget;
       setCrop(centerAspectCrop(width, height, aspect));
-    }
+      
+    
   }
-
-
-
-
-
-
-
 
 
 
@@ -199,8 +111,6 @@ export default function Crop({onCropChange, imgSrc}) {
       offscreen.height
     );
 
-    
-
     const blob = await offscreen.convertToBlob({
       type: "image/png",
     });
@@ -209,9 +119,29 @@ export default function Crop({onCropChange, imgSrc}) {
       URL.revokeObjectURL(blobUrlRef.current);
     }
     const dataURL = await blobToDataURL(blob);
+
+    const filterRoute = isSepia ? "applySepia" : isBlackAndWhite ? "applyBlackAndWhite" : null;
+    if (filterRoute === null){
+      blobUrlRef.current = URL.createObjectURL(blob);
+      hiddenAnchorRef.current.href = blobUrlRef.current;
+      hiddenAnchorRef.current.download = fileName;
+      hiddenAnchorRef.current.click();
+    }else{
+      colorChange(dataURL)
+    }
+  }
+
+
+
+
+
+  function colorChange(dataURL){
+    const filterRoute = isSepia ? "applySepia" : isBlackAndWhite ? "applyBlackAndWhite" : null;
+
     const base64Image = dataURL.split(",")[1];
+
     axios
-        .post("http://localhost:8000/applySepia", {
+        .post(`http://localhost:8000/${filterRoute}`, {
           imageData: base64Image,
         }, {
           responseType: 'blob', // Set the response type to blob
@@ -223,25 +153,22 @@ export default function Crop({onCropChange, imgSrc}) {
           // Create a link element
           const link = document.createElement('a');
           link.href = window.URL.createObjectURL(blob);
-  
           // Set the download attribute with the desired file name
-          link.download = 'modified_image.jpg';
-  
-          // Append the link to the document
+          link.download = fileName;
           document.body.appendChild(link);
-  
-          // Trigger a click on the link to initiate the download
           link.click();
-  
-          // Remove the link from the document
           document.body.removeChild(link);
         })
         .catch((error) => {
           console.error("Error:", error);
         });
-    
-
   }
+
+
+
+
+
+
 
 
   function blobToDataURL(blob) {
@@ -252,11 +179,6 @@ export default function Crop({onCropChange, imgSrc}) {
       reader.readAsDataURL(blob);
     });
   }
-
-
-
-
-
 
   useDebounceEffect(
     () => {
@@ -281,15 +203,35 @@ export default function Crop({onCropChange, imgSrc}) {
     [completedCrop, scale, rotate]
   );
 
-  function handleToggleAspectClick() {
-    if (aspect) {
-      setAspect(undefined);
+  function handleAspectChange(selectedValue) {
+    if (selectedValue === aspect) {
+      setAspect(null);
+      setCrop({});
+      setCompletedCrop(null);
     } else {
-      setAspect(16 / 9);
+      setAspect(selectedValue);
 
       if (imgRef.current) {
         const { width, height } = imgRef.current;
-        const newCrop = centerAspectCrop(width, height, 16 / 9);
+
+        let newCrop;
+        if (completedCrop) {
+          newCrop = centerAspectCrop(width, height, selectedValue);
+        } else {
+          newCrop = makeAspectCrop(
+            {
+              unit: "%",
+              aspect: selectedValue,
+              x: crop.x || 0,
+              y: crop.y || 0,
+              width: crop.width || 100,
+              height: crop.height || 100,
+            },
+            width,
+            height
+          );
+        }
+
         setCrop(newCrop);
         setCompletedCrop(convertToPixelCrop(newCrop, width, height));
       }
@@ -302,18 +244,7 @@ export default function Crop({onCropChange, imgSrc}) {
 
       <div className="Crop-Controls">
         <div>
-          <label htmlFor="scale-input">Scale: </label>
-          <input
-            id="scale-input"
-            type="number"
-            step="0.1"
-            value={scale}
-            disabled={!imgSrc}
-            onChange={(e) => setScale(Number(e.target.value))}
-          />
-        </div>
-        <div>
-          <label htmlFor="rotate-input">Rotate: </label>
+        <label htmlFor="rotate-input">Rotate: </label>
           <input
             id="rotate-input"
             type="number"
@@ -323,6 +254,19 @@ export default function Crop({onCropChange, imgSrc}) {
               setRotate(Math.min(180, Math.max(-180, Number(e.target.value))))
             }
           />
+        </div>
+        <div>
+        <label htmlFor="scale-input">Scale: </label>
+          <input
+            id="scale-input"
+            type="range"
+            step="0.1"
+            value={scale}
+            disabled={!imgSrc}
+            onChange={(e) => setScale(Number(e.target.value))}
+            min='1.0'
+          />
+          <span>{scale.toFixed(1)}</span> 
           <div>
             <button onClick={toggleSepia}>Toggle Sepia</button>
           </div>
@@ -331,10 +275,23 @@ export default function Crop({onCropChange, imgSrc}) {
           </div>
         </div>
         <div>
-          <button onClick={handleToggleAspectClick}>
-            Toggle aspect {aspect ? "off" : "on"}
-          </button>
+          <label htmlFor="aspectSelect">Aspect Ratio:</label>
+          <select
+            id="aspectSelect"
+            value={aspect || ""}
+            onChange={(e) => handleAspectChange(parseFloat(e.target.value))}
+          >
+            
+            {aspectOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          
         </div>
+        
+             
       </div>
       {!!imgSrc && (
         
@@ -367,9 +324,7 @@ export default function Crop({onCropChange, imgSrc}) {
               }}
             />
           </div> }
-          <div>
-            <button onClick={applySepia}>Apply Changes</button>
-          </div>
+          
           <div>
             <button onClick={onDownloadCropClick}>Download Crop</button>
             {/* <div style={{ fontSize: 12, color: "#666" }}>

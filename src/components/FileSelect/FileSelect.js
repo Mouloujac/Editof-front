@@ -5,7 +5,7 @@ export default function FileSelect({ onSelectFile }) {
 
     return (
         <div className="FileSelect">
-            <input type="file" accept="image/*" onChange={onSelectFile} />
+            <input type="file" accept="image/*" onChange={onSelectFile} id="fileSelect"/>
         </div>
     );
 }
