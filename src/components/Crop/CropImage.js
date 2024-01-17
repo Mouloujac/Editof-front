@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactCrop, {
+  centerCrop,
   makeAspectCrop,
+  Crop,
+  PixelCrop,
   convertToPixelCrop,
 } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -8,23 +11,24 @@ import { canvasPreview } from "./canvasPreview";
 import { useDebounceEffect } from "./useDebounceEffect";
 import axios from "axios";
 
-function centerCrop(mediaWidth, mediaHeight, aspect) {
-  return makeAspectCrop(
-    {
-      unit: "%",
-      width: 90,
-    },
-    aspect,
+function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
+  return centerCrop(
+    makeAspectCrop(
+      {
+        unit: "%",
+        width: 97,
+      },
+      aspect,
+      mediaWidth,
+      mediaHeight
+    ),
     mediaWidth,
-    mediaHeight,
+    mediaHeight
   );
 }
 
-function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
-  return centerCrop(mediaWidth, mediaHeight, aspect);
-}
 
-export default function Crop({onCropChange, imgSrc, fileName}) {
+export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVisible, isSelectVisible}) {
   
   const previewCanvasRef = useRef(null);
   const imgRef = useRef(null);
@@ -38,6 +42,13 @@ export default function Crop({onCropChange, imgSrc, fileName}) {
   const [isSepia, setIsSepia] = useState(false);
   const [isBlackAndWhite, setIsBlackAndWhite] = useState(false);
   const [newImage, setNewImage] = useState()
+  const [manualWidth, setManualWidth] = useState("");
+  const [manualHeight, setManualHeight] = useState("");
+  const [baseWidth, setBaseWidth] = useState("")
+  const [baseHeight, setBaseHeight] = useState("")
+  const [newWidth, setNewWidth] = useState("")
+  const [newHeight, setNewHeight] = useState("")
+
   
 
   const toggleSepia = () => {
@@ -51,7 +62,7 @@ export default function Crop({onCropChange, imgSrc, fileName}) {
   };
 
   const imageStyle = {
-    maxWidth: "100%",
+    Width: "100%",
     filter: isSepia
       ? "sepia(1)"
       : isBlackAndWhite
@@ -61,20 +72,53 @@ export default function Crop({onCropChange, imgSrc, fileName}) {
   };
 
   const aspectOptions = [
-    { label: "Libre", value: undefined },
+    { label: "Libre", value: 100 },
+    // { label: "Original", value: 1 },
     { label: "16:9", value: 16 / 9 },
-    { label: "1:1", value: 1 },
+    // { label: "1:1", value: 1 },
+    { label: "4:3 (Moniteur)", value: 4 / 3 },
+    { label: "3:4 (Profile)", value: 3 / 4 },
+    { label: "14:9", value: 14 / 9 },
+    { label: "16:9 (Ecran large)", value: 1 },
+    { label: "9:16 (Story)", value: 9 / 16 },
+    { label: "16:10", value: 16 / 10 },
+    { label: "2:1", value: 2 / 1 },
+    { label: "3:1 (Panoramique)", value: 3 / 1 },
+    { label: "4:1", value: 4 / 1 },
+    { label: "3:2 (Film 35mm)", value: 3 / 2 },
+    { label: "5:4", value: 5 / 4 },
+    { label: "7:5", value: 7 / 5 },
+    { label: "19:10", value: 19 / 10 },
+    { label: "21:9 (cinemascope)", value: 21 / 9 },
+    { label: "32:9 (Super ultra grand)", value: 32 / 9 },
+    { label: "Photo de couverture Facebook", value: 851 / 315 },
     
-    // Ajoutez d'autres options d'aspect au besoin
   ];
 
   function onImageLoad(e) {
+    setBaseWidth(imgRef.current.naturalWidth)
+    setBaseHeight(imgRef.current.naturalHeight)
+    if (aspect) {
       const { width, height } = e.currentTarget;
       setCrop(centerAspectCrop(width, height, aspect));
-      
-    
+    }else{
+      setAspect(undefined)
+      const { width, height } = e.currentTarget;
+      setCrop(centerAspectCrop(width, height, 3/2));
+    }
   }
+  
 
+  useEffect(() =>{
+    const image = imgRef.current;
+    const { width, height } = imgRef.current;
+    // console.log("manualheight="+manualHeight)
+    if(crop){
+      
+      setNewWidth(Math.round((crop.width / 100) * baseWidth))
+      setNewHeight(Math.round((crop.height / 100) * baseHeight))
+    }
+  },[crop])
 
 
 
@@ -149,7 +193,7 @@ export default function Crop({onCropChange, imgSrc, fileName}) {
         .then((response) => {
           // Create a blob from the response data
           const blob = new Blob([response.data], { type: response.headers['content-type'] });
-          console.log(blob)
+          
           // Create a link element
           const link = document.createElement('a');
           link.href = window.URL.createObjectURL(blob);
@@ -203,44 +247,35 @@ export default function Crop({onCropChange, imgSrc, fileName}) {
     [completedCrop, scale, rotate]
   );
 
+
+  
+
   function handleAspectChange(selectedValue) {
-    if (selectedValue === aspect) {
-      setAspect(null);
-      setCrop({});
-      setCompletedCrop(null);
+    if (selectedValue === 100) {
+      setAspect(undefined);
+      console.log('ok')
     } else {
       setAspect(selectedValue);
-
+      console.log(selectedValue)
+  
       if (imgRef.current) {
         const { width, height } = imgRef.current;
-
-        let newCrop;
-        if (completedCrop) {
-          newCrop = centerAspectCrop(width, height, selectedValue);
-        } else {
-          newCrop = makeAspectCrop(
-            {
-              unit: "%",
-              aspect: selectedValue,
-              x: crop.x || 0,
-              y: crop.y || 0,
-              width: crop.width || 100,
-              height: crop.height || 100,
-            },
-            width,
-            height
-          );
-        }
-
+        const newCrop = centerAspectCrop(width, height, selectedValue);
         setCrop(newCrop);
+        // Updates the preview
         setCompletedCrop(convertToPixelCrop(newCrop, width, height));
       }
     }
   }
+ 
+  
 
   return (
     <div className="Crop">
-      <button onClick={onCropChange}>Crop</button>
+      {!isSelectVisible && (
+                <button onClick={() => setIsSelectVisible(true)}>Crop</button>
+            )}
+      
 
       <div className="Crop-Controls">
         <div>
@@ -283,11 +318,22 @@ export default function Crop({onCropChange, imgSrc, fileName}) {
           >
             
             {aspectOptions.map((option) => (
-              <option key={option.value} value={option.value}>
+              <option key={option.label} value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
+          <div>
+            <label>Width:</label>
+
+            <span>{newWidth}</span>
+          </div>
+          <div>
+            <label>Height:</label>
+        
+            <span>{newHeight}</span>
+          </div>
+
           
         </div>
         
@@ -300,6 +346,10 @@ export default function Crop({onCropChange, imgSrc, fileName}) {
           onChange={(_, percentCrop) => setCrop(percentCrop)}
           onComplete={(c) => setCompletedCrop(c)}
           aspect={aspect}
+          style={{
+            width: "800px",
+          }}
+          
         >
           <img
             ref={imgRef}
