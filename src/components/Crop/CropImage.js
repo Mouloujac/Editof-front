@@ -41,14 +41,14 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
   const [aspect, setAspect] = useState(undefined);
   const [isSepia, setIsSepia] = useState(false);
   const [isBlackAndWhite, setIsBlackAndWhite] = useState(false);
-  const [newImage, setNewImage] = useState()
-  const [manualWidth, setManualWidth] = useState("");
-  const [manualHeight, setManualHeight] = useState("");
   const [baseWidth, setBaseWidth] = useState("")
   const [baseHeight, setBaseHeight] = useState("")
   const [newWidth, setNewWidth] = useState("")
   const [newHeight, setNewHeight] = useState("")
-
+  const [mirrorX, setMirrorX] = useState("0")
+  const [mirrorY, setMirrorY] = useState("0")
+  const [scaleFlipX, setScaleFlipX] = useState()
+  const [scaleFlipY, setScaleFlipY] = useState()
   
 
   const toggleSepia = () => {
@@ -120,20 +120,71 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
     }
   },[crop])
 
+  
 
+  function mirroringImageY() {
+   if(mirrorY === "0" && mirrorX === "1"){
+    console.log("2 activés")
+    setScaleFlipX(-1)
+    setScaleFlipY(-1)
+    setMirrorY("1")
+   }else if(mirrorY === "0" && mirrorX === "0"){
+    console.log("Juste Y")
+    setScaleFlipX(1)
+    setScaleFlipY(-1)
+    setMirrorY("1")
+   }else if(mirrorY === "1" && mirrorX === "1"){
+    console.log("Juste X")
+    setScaleFlipX(-1)
+    setScaleFlipY(1)
+    setMirrorY("0")
+  }else{
+    console.log("Retour normal")
+    setScaleFlipX(1)
+    setScaleFlipY(1)
+    setMirrorY("0")
+   }
 
+  }
+
+  function mirroringImageX() {
+    if(mirrorX === "0" && mirrorY === "1"){
+      console.log("2 activés")
+      setScaleFlipX(-1)
+      setScaleFlipY(-1)
+      setMirrorX("1")
+    }else if(mirrorX === "0" && mirrorY === "0"){
+      console.log("Juste X")
+      setScaleFlipX(-1)
+      setScaleFlipY(1)
+      setMirrorX("1")
+    }else if(mirrorX === "1" && mirrorY === "1"){
+      console.log("Juste Y")
+      setScaleFlipX(1)
+      setScaleFlipY(-1)
+      setMirrorX("0")
+    }else{
+      console.log("Retour normal")
+      setScaleFlipX(1)
+      setScaleFlipY(1)
+      setMirrorX("0")
+    }
+ 
+   }
+
+  
 
   async function onDownloadCropClick() {
-    
     const image = imgRef.current;
     const previewCanvas = previewCanvasRef.current;
     if (!image || !previewCanvas || !completedCrop) {
       throw new Error("Crop canvas does not exist");
     }
-
+    
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
-
+    console.log("scaleY:"+scaleY)
+    console.log("scaleX:"+scaleX)
     const offscreen = new OffscreenCanvas(
       completedCrop.width * scaleX,
       completedCrop.height * scaleY
@@ -187,13 +238,15 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
     axios
         .post(`http://localhost:8000/${filterRoute}`, {
           imageData: base64Image,
+          mirrorX: mirrorX,
+          mirrorY: mirrorY,
         }, {
           responseType: 'blob', // Set the response type to blob
         })
         .then((response) => {
           // Create a blob from the response data
           const blob = new Blob([response.data], { type: response.headers['content-type'] });
-          
+          console.log("envoyé")
           // Create a link element
           const link = document.createElement('a');
           link.href = window.URL.createObjectURL(blob);
@@ -279,6 +332,8 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
 
       <div className="Crop-Controls">
         <div>
+        <button onClick={() => mirroringImageY()}>Mirror Y</button>
+        <button onClick={() => mirroringImageX()}>Mirror X</button>
         <label htmlFor="rotate-input">Rotate: </label>
           <input
             id="rotate-input"
@@ -291,16 +346,17 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
           />
         </div>
         <div>
+      
         <label htmlFor="scale-input">Scale: </label>
-          <input
-            id="scale-input"
-            type="range"
-            step="0.1"
+        <input
+          id="scale-input"
+          type="range"
+          step="0.1"
             value={scale}
-            disabled={!imgSrc}
+          disabled={!imgSrc}
             onChange={(e) => setScale(Number(e.target.value))}
-            min='1.0'
-          />
+          min='1.0'
+        />
           <span>{scale.toFixed(1)}</span> 
           <div>
             <button onClick={toggleSepia}>Toggle Sepia</button>
@@ -357,6 +413,7 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
             src={imgSrc}
             style={imageStyle}
             onLoad={onImageLoad}
+            id="imageCanvas"
           />
         </ReactCrop>
       )}
