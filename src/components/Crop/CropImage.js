@@ -28,7 +28,7 @@ function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
 }
 
 
-export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVisible, isSelectVisible}) {
+export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, setIsSelectVisible, isSelectVisible}) {
   
   const previewCanvasRef = useRef(null);
   const imgRef = useRef(null);
@@ -68,7 +68,7 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
       : isBlackAndWhite
       ? "grayscale(1)"
       : "none",
-    transform: `scale(${scale}) rotate(${rotate}deg)`
+    transform: `scale(${scale}) scaleX(${scaleFlipX}) scaleY(${scaleFlipY}) rotate(${rotate}deg)`
   };
 
   const aspectOptions = [
@@ -98,6 +98,7 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
   function onImageLoad(e) {
     setBaseWidth(imgRef.current.naturalWidth)
     setBaseHeight(imgRef.current.naturalHeight)
+    
     if (aspect) {
       const { width, height } = e.currentTarget;
       setCrop(centerAspectCrop(width, height, aspect));
@@ -105,6 +106,16 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
       setAspect(undefined)
       const { width, height } = e.currentTarget;
       setCrop(centerAspectCrop(width, height, 3/2));
+    }
+    
+    if (previewCanvasRef.current && completedCrop) {
+      canvasPreview(
+        imgRef.current,
+        previewCanvasRef.current,
+        completedCrop,
+        scale,
+        rotate
+      );
     }
   }
   
@@ -122,78 +133,109 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
 
   
 
-  function mirroringImageY() {
-   if(mirrorY === "0" && mirrorX === "1"){
+  function mirroringImageX() {
+   if(mirrorY === "1" && mirrorX === "0"){
     console.log("2 activés")
     setScaleFlipX(-1)
     setScaleFlipY(-1)
-    setMirrorY("1")
+    setMirrorX("1")
    }else if(mirrorY === "0" && mirrorX === "0"){
     console.log("Juste Y")
     setScaleFlipX(1)
     setScaleFlipY(-1)
-    setMirrorY("1")
+    setMirrorX("1")
    }else if(mirrorY === "1" && mirrorX === "1"){
     console.log("Juste X")
     setScaleFlipX(-1)
     setScaleFlipY(1)
-    setMirrorY("0")
+    setMirrorX("0")
   }else{
     console.log("Retour normal")
     setScaleFlipX(1)
     setScaleFlipY(1)
-    setMirrorY("0")
+    setMirrorX("0")
    }
 
   }
 
-  function mirroringImageX() {
-    if(mirrorX === "0" && mirrorY === "1"){
+  function mirroringImageY() {
+    if(mirrorX === "1" && mirrorY === "0"){
       console.log("2 activés")
       setScaleFlipX(-1)
       setScaleFlipY(-1)
-      setMirrorX("1")
+      setMirrorY("1")
     }else if(mirrorX === "0" && mirrorY === "0"){
       console.log("Juste X")
       setScaleFlipX(-1)
       setScaleFlipY(1)
-      setMirrorX("1")
+      setMirrorY("1")
     }else if(mirrorX === "1" && mirrorY === "1"){
       console.log("Juste Y")
       setScaleFlipX(1)
       setScaleFlipY(-1)
-      setMirrorX("0")
+      setMirrorY("0")
     }else{
       console.log("Retour normal")
       setScaleFlipX(1)
       setScaleFlipY(1)
-      setMirrorX("0")
+      setMirrorY("0")
     }
  
    }
-
   
+  async function makeChanges(){
+    const filterRoute = isSepia ? "applySepia" :
+    isBlackAndWhite ? "applyBlackAndWhite" :
+    (mirrorX === "1" || mirrorY === "1") ? "applyJustMirroring" :
+    null;
+  
+    if (filterRoute === null){
+      try {
+        
+        onDownloadCropClick(); // Attend que onDownloadCropClick soit terminé
+        // Reste du code
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }else{
+      try {
+        await colorChange(); // Attend que colorChange soit terminé
+        sleep(2000).then(() => {
+          onDownloadCropClick();
+        });
+        // Reste du code
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+  }
+  
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
   async function onDownloadCropClick() {
-    const image = imgRef.current;
+    console.log('commencé')
+    setBaseWidth(imgRef.current.naturalWidth);
+    setBaseHeight(imgRef.current.naturalHeight);
+    
+  
+    const image = document.getElementById("imageCanvas"); // Utiliser getElementById
     const previewCanvas = previewCanvasRef.current;
     if (!image || !previewCanvas || !completedCrop) {
       throw new Error("Crop canvas does not exist");
     }
-    
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-    console.log("scaleY:"+scaleY)
-    console.log("scaleX:"+scaleX)
+  
     const offscreen = new OffscreenCanvas(
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY
+      previewCanvas.width,
+      previewCanvas.height
     );
+  
     const ctx = offscreen.getContext("2d");
     if (!ctx) {
       throw new Error("No 2d context");
     }
-
+  
     ctx.drawImage(
       previewCanvas,
       0,
@@ -205,60 +247,59 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
       offscreen.width,
       offscreen.height
     );
-
+  
     const blob = await offscreen.convertToBlob({
       type: "image/png",
     });
-    
+  
     if (blobUrlRef.current) {
       URL.revokeObjectURL(blobUrlRef.current);
     }
-    const dataURL = await blobToDataURL(blob);
-
-    const filterRoute = isSepia ? "applySepia" : isBlackAndWhite ? "applyBlackAndWhite" : null;
-    if (filterRoute === null){
-      blobUrlRef.current = URL.createObjectURL(blob);
-      hiddenAnchorRef.current.href = blobUrlRef.current;
-      hiddenAnchorRef.current.download = fileName;
-      hiddenAnchorRef.current.click();
-    }else{
-      colorChange(dataURL)
-    }
+  
+    blobUrlRef.current = URL.createObjectURL(blob);
+    hiddenAnchorRef.current.href = blobUrlRef.current;
+    hiddenAnchorRef.current.download = fileName;
+    hiddenAnchorRef.current.click();
   }
+  
 
 
 
 
 
-  function colorChange(dataURL){
-    const filterRoute = isSepia ? "applySepia" : isBlackAndWhite ? "applyBlackAndWhite" : null;
-
-    const base64Image = dataURL.split(",")[1];
-
-    axios
-        .post(`http://localhost:8000/${filterRoute}`, {
-          imageData: base64Image,
-          mirrorX: mirrorX,
-          mirrorY: mirrorY,
-        }, {
-          responseType: 'blob', // Set the response type to blob
-        })
-        .then((response) => {
-          // Create a blob from the response data
-          const blob = new Blob([response.data], { type: response.headers['content-type'] });
-          console.log("envoyé")
-          // Create a link element
-          const link = document.createElement('a');
-          link.href = window.URL.createObjectURL(blob);
-          // Set the download attribute with the desired file name
-          link.download = fileName;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
+  function colorChange() {
+    const filterRoute = isSepia ? "applySepia" :
+      isBlackAndWhite ? "applyBlackAndWhite" :
+      (mirrorX === "1" || mirrorY === "1") ? "applyJustMirroring" :
+      null;
+  
+    const image = document.getElementById("imageCanvas");
+    const imageSrc = image.src;
+    const base64Image = imageSrc.split(",")[1];
+  
+    return new Promise((resolve, reject) => {
+      axios.post(`http://localhost:8000/${filterRoute}`, {
+        imageData: base64Image,
+        mirrorX: mirrorX,
+        mirrorY: mirrorY,
+      }, {
+        responseType: 'blob',
+      })
+      .then(response => {
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+          setImgSrc(reader.result?.toString() || "");
+           // Résoud la promesse une fois que tout est terminé
         });
+        reader.readAsDataURL(response.data);
+        resolve();
+      })
+      
+      .catch(error => {
+        console.error("Error:", error);
+        reject(error); // Rejette la promesse en cas d'erreur
+      });
+    });
   }
 
 
@@ -413,6 +454,7 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
             src={imgSrc}
             style={imageStyle}
             onLoad={onImageLoad}
+            onChange={onImageLoad}
             id="imageCanvas"
           />
         </ReactCrop>
@@ -433,7 +475,7 @@ export default function CropImage({onCropChange, imgSrc, fileName, setIsSelectVi
           </div> }
           
           <div>
-            <button onClick={onDownloadCropClick}>Download Crop</button>
+            <button onClick={makeChanges}>Download Crop</button>
             {/* <div style={{ fontSize: 12, color: "#666" }}>
               You need to open the CodeSandbox preview in a new window (top
               right icon) as security restrictions prevent the download
