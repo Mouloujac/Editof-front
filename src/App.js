@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import CropImage from './components/Crop/CropImage.js';
 import FileSelect from './components/FileSelect/FileSelect.js';
+import Title from './components/Title/Title.js';
+import TitleCrop from './components/Title/TitleCrop.js';
 
 function App() {
     const [imgSrc, setImgSrc] = useState("");
@@ -44,15 +46,22 @@ function App() {
     }
 
     return (
-        <div className="App">
+        <div className="App flex flex-col">
             <header className="App-header">
+            
+            </header>
             {isSelectVisible && (
+                <section className='flex flex-col'>
+                <Title />
                 <FileSelect onSelectFile={onSelectFile} onFileDrop={handleFileDrop}  />
+                </section>
             )}
                 {!!imgSrc && (
-                    <CropImage  imgSrc={imgSrc} setImgSrc={setImgSrc} isSelectVisible={isSelectVisible} setIsSelectVisible={setIsSelectVisible} selectedImage={selectedImage} setSelectedImage={setSelectedImage} fileName={fileName}/>
+                    <>
+                        <TitleCrop />
+                        <CropImage  imgSrc={imgSrc} setImgSrc={setImgSrc} isSelectVisible={isSelectVisible} setIsSelectVisible={setIsSelectVisible} selectedImage={selectedImage} setSelectedImage={setSelectedImage} fileName={fileName}/>
+                    </>
                 )}
-            </header>
         </div>
     );
 }

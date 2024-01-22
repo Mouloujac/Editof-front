@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+
+#imageCanvas{
+  transform: scale(1), scaleX(1), scaleY(1), rotate(0deg);
+
+}
+
+.Crop{
+  width: 100%;
+}
+
+#inputSection{
+  background-color:#fad79c ;
+}

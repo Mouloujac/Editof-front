@@ -9,6 +9,7 @@ import ReactCrop, {
 import "react-image-crop/dist/ReactCrop.css";
 import { canvasPreview } from "./canvasPreview";
 import { useDebounceEffect } from "./useDebounceEffect";
+import Inputs from "../Inputs/Inputs";
 import axios from "axios";
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
@@ -52,13 +53,20 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
   
 
   const toggleSepia = () => {
+    
     setIsSepia(!isSepia);
-    setIsBlackAndWhite(false); // Ensure only one filter is applied at a time
+    
+    var x = document.getElementById("sepiaCheck").checked;
+    document.getElementById("b&wCheck").checked = false;
+    console.log("sepia:"+x)
+
   };
 
   const toggleBlackAndWhite = () => {
     setIsBlackAndWhite(!isBlackAndWhite);
-    setIsSepia(false); // Ensure only one filter is applied at a time
+    var x = document.getElementById("b&wCheck").checked;
+    document.getElementById("sepiaCheck").checked = false;
+    console.log("b&w:"+ x)
   };
 
   const imageStyle = {
@@ -98,7 +106,7 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
   function onImageLoad(e) {
     setBaseWidth(imgRef.current.naturalWidth)
     setBaseHeight(imgRef.current.naturalHeight)
-    
+    setStyle()
     if (aspect) {
       const { width, height } = e.currentTarget;
       setCrop(centerAspectCrop(width, height, aspect));
@@ -129,9 +137,14 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
       setNewWidth(Math.round((crop.width / 100) * baseWidth))
       setNewHeight(Math.round((crop.height / 100) * baseHeight))
     }
-  },[crop])
+    
+  },[crop, rotate])
 
-  
+  function setStyle(){
+    setScaleFlipX(1)
+    setScaleFlipY(1)
+    setMirrorX("0")
+  }
 
   function mirroringImageX() {
    if(mirrorY === "1" && mirrorX === "0"){
@@ -180,7 +193,6 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
       setScaleFlipY(1)
       setMirrorY("0")
     }
- 
    }
   
   async function makeChanges(){
@@ -362,102 +374,63 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
     }
   }
  
-  
+  function handleRotateChange() {
+    const rotateInput = document.getElementById("rotate-input")
+    const value = Math.min(180, Math.max(-180, Number(rotateInput.value)));
+    setRotate(value);
+    console.log("coucou")
+  }
 
   return (
-    <div className="Crop">
-      {!isSelectVisible && (
+    <div className="Crop flex justify-center ">
+      <container className="flex justify-evenly p-4 bg-neutral-100">
+      {/* {!isSelectVisible && (
                 <button onClick={() => setIsSelectVisible(true)}>Crop</button>
             )}
-      
-
-      <div className="Crop-Controls">
-        <div>
-        <button onClick={() => mirroringImageY()}>Mirror Y</button>
-        <button onClick={() => mirroringImageX()}>Mirror X</button>
-        <label htmlFor="rotate-input">Rotate: </label>
-          <input
-            id="rotate-input"
-            type="number"
-            value={rotate}
-            disabled={!imgSrc}
-            onChange={(e) =>
-              setRotate(Math.min(180, Math.max(-180, Number(e.target.value))))
-            }
-          />
-        </div>
-        <div>
-      
-        <label htmlFor="scale-input">Scale: </label>
-        <input
-          id="scale-input"
-          type="range"
-          step="0.1"
-            value={scale}
-          disabled={!imgSrc}
-            onChange={(e) => setScale(Number(e.target.value))}
-          min='1.0'
+       */}
+      <Inputs 
+            mirroringImageX={mirroringImageX}
+            mirroringImageY={mirroringImageY}
+            setMirrorX={setMirrorX}
+            rotate={rotate}
+            imgSrc={imgSrc}
+            setRotate={setRotate}
+            scale={scale}
+            setScale={setScale}
+            toggleSepia={toggleSepia}
+            toggleBlackAndWhite={toggleBlackAndWhite}
+            aspect={aspect}
+            handleAspectChange={handleAspectChange}
+            aspectOptions={aspectOptions}
+            newWidth={newWidth}
+            newHeight={newHeight}
+            handleRotateChange={handleRotateChange}
         />
-          <span>{scale.toFixed(1)}</span> 
-          <div>
-            <button onClick={toggleSepia}>Toggle Sepia</button>
-          </div>
-          <div>
-            <button onClick={toggleBlackAndWhite}>Toggle B&W</button>
-          </div>
-        </div>
-        <div>
-          <label htmlFor="aspectSelect">Aspect Ratio:</label>
-          <select
-            id="aspectSelect"
-            value={aspect || ""}
-            onChange={(e) => handleAspectChange(parseFloat(e.target.value))}
-          >
-            
-            {aspectOptions.map((option) => (
-              <option key={option.label} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <div>
-            <label>Width:</label>
-
-            <span>{newWidth}</span>
-          </div>
-          <div>
-            <label>Height:</label>
-        
-            <span>{newHeight}</span>
-          </div>
-
-          
-        </div>
-        
-             
-      </div>
+      <section className="flex">
       {!!imgSrc && (
         
-        <ReactCrop
-          crop={crop}
-          onChange={(_, percentCrop) => setCrop(percentCrop)}
-          onComplete={(c) => setCompletedCrop(c)}
-          aspect={aspect}
-          style={{
-            width: "800px",
-          }}
-          
-        >
-          <img
-            ref={imgRef}
-            alt="Crop me"
-            src={imgSrc}
-            style={imageStyle}
-            onLoad={onImageLoad}
-            onChange={onImageLoad}
-            id="imageCanvas"
-          />
-        </ReactCrop>
+          <ReactCrop
+            crop={crop}
+            onChange={(_, percentCrop) => setCrop(percentCrop)}
+            onComplete={(c) => setCompletedCrop(c)}
+            aspect={aspect}
+            style={{
+              width: "800px",
+            }}
+            
+          >
+            <img
+              ref={imgRef}
+              alt="Crop me"
+              src={imgSrc}
+              style={imageStyle}
+              onLoad={onImageLoad}
+              onChange={onImageLoad}
+              id="imageCanvas"
+            />
+          </ReactCrop>
+        
+        
       )}
       {!!completedCrop && (
         <>
@@ -475,7 +448,7 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
           </div> }
           
           <div>
-            <button onClick={makeChanges}>Download Crop</button>
+            <button onClick={makeChanges}>Download Crop</button> 
             {/* <div style={{ fontSize: 12, color: "#666" }}>
               You need to open the CodeSandbox preview in a new window (top
               right icon) as security restrictions prevent the download
@@ -495,6 +468,18 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
           </div>
         </>
       )}
+          <div className="absolute bottom-0 right-1/3 mb-3 mr-5">
+              <label>Width:</label>
+
+              <span>{newWidth}</span>
+          </div>
+          <div className="absolute right-0 top-1/2 p-8">
+              <label>Height:</label>
+          
+              <span>{newHeight}</span>
+          </div>
+        </section>
+      </container>
     </div>
   );
 }
