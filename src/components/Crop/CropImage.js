@@ -11,6 +11,8 @@ import { canvasPreview } from "./canvasPreview";
 import { useDebounceEffect } from "./useDebounceEffect";
 import Inputs from "../Inputs/Inputs";
 import axios from "axios";
+import Loader from "../Loader/Loader";
+import "./CropImage.css";
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
   return centerCrop(
@@ -29,7 +31,7 @@ function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
 }
 
 
-export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, setIsSelectVisible, isSelectVisible}) {
+export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, setIsSelectVisible, isSelectVisible, load, setLoad}) {
   
   const previewCanvasRef = useRef(null);
   const imgRef = useRef(null);
@@ -50,6 +52,7 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
   const [mirrorY, setMirrorY] = useState("0")
   const [scaleFlipX, setScaleFlipX] = useState()
   const [scaleFlipY, setScaleFlipY] = useState()
+  
   
 
   const toggleSepia = () => {
@@ -106,7 +109,7 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
   function onImageLoad(e) {
     setBaseWidth(imgRef.current.naturalWidth)
     setBaseHeight(imgRef.current.naturalHeight)
-    setStyle()
+    
     if (aspect) {
       const { width, height } = e.currentTarget;
       setCrop(centerAspectCrop(width, height, aspect));
@@ -126,25 +129,55 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
       );
     }
   }
-  
+  function defautInputs(){
+    if(document.getElementById("b&wCheck").checked === true){
+      document.getElementById("b&wCheck").checked = false;
+      setIsBlackAndWhite(!isBlackAndWhite)
+    }
+    if(document.getElementById("sepiaCheck").checked === true){
+      document.getElementById("sepiaCheck").checked = false;
+      setIsSepia(!isSepia)
+    }
+    if(document.getElementById("mirrorInputY").checked === true){
+      setMirrorY('0')
+      setScaleFlipY(1)
+      document.getElementById("mirrorInputY").checked = false;
+      
+    }
+    if(document.getElementById("mirrorInputX").checked === true){
+      setMirrorX('0')
+      setScaleFlipX(1)
+      document.getElementById("mirrorInputX").checked = false;
+      
+    }
+    
+  }
 
   useEffect(() =>{
     const image = imgRef.current;
     const { width, height } = imgRef.current;
     // console.log("manualheight="+manualHeight)
+    // if (mirrorY === "1" && rotate !== 0) {
+    //   setRotate(-rotate)
+    // }
     if(crop){
       
       setNewWidth(Math.round((crop.width / 100) * baseWidth))
       setNewHeight(Math.round((crop.height / 100) * baseHeight))
     }
     
-  },[crop, rotate])
+  },[crop])
 
-  function setStyle(){
-    setScaleFlipX(1)
-    setScaleFlipY(1)
-    setMirrorX("0")
-  }
+  useEffect(() =>{
+  
+    if (mirrorY === "1" && rotate !== 0) {
+      setRotate(-rotate)
+    }
+    
+    
+  },[load])
+  
+  
 
   function mirroringImageX() {
    if(mirrorY === "1" && mirrorX === "0"){
@@ -200,8 +233,8 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
     isBlackAndWhite ? "applyBlackAndWhite" :
     (mirrorX === "1" || mirrorY === "1") ? "applyJustMirroring" :
     null;
-  
-    if (filterRoute === null){
+    setLoad(!load)
+    if (filterRoute === null && mirrorX === "0" && mirrorY === "0"){
       try {
         
         onDownloadCropClick(); // Attend que onDownloadCropClick soit terminé
@@ -212,6 +245,7 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
     }else{
       try {
         await colorChange(); // Attend que colorChange soit terminé
+        
         sleep(2000).then(() => {
           onDownloadCropClick();
         });
@@ -226,14 +260,33 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  
+  
   async function onDownloadCropClick() {
-    console.log('commencé')
+    console.log('commencé');
+  
+    
     setBaseWidth(imgRef.current.naturalWidth);
     setBaseHeight(imgRef.current.naturalHeight);
-    
+
   
-    const image = document.getElementById("imageCanvas"); // Utiliser getElementById
+    if (mirrorY === "1" && rotate !== 0) {
+      if (rotate > 0) {
+        setRotate(-rotate);
+      } else if (rotate < 0) {
+        setRotate(Math.abs(rotate));
+      }
+    }else if(mirrorX === "1" && rotate !== 0){
+      if (rotate > 0) {
+        setRotate(-rotate);
+      } else if (rotate < 0) {
+        setRotate(Math.abs(rotate));
+      }
+    }
+
+    const image = document.getElementById("imageCanvas");
     const previewCanvas = previewCanvasRef.current;
+  
     if (!image || !previewCanvas || !completedCrop) {
       throw new Error("Crop canvas does not exist");
     }
@@ -272,10 +325,12 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
     hiddenAnchorRef.current.href = blobUrlRef.current;
     hiddenAnchorRef.current.download = fileName;
     hiddenAnchorRef.current.click();
+    
+    defautInputs()
+    setLoad(false)
+
   }
   
-
-
 
 
 
@@ -301,9 +356,11 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
         const reader = new FileReader();
         reader.addEventListener("load", () => {
           setImgSrc(reader.result?.toString() || "");
+          
            // Résoud la promesse une fois que tout est terminé
         });
         reader.readAsDataURL(response.data);
+        
         resolve();
       })
       
@@ -311,22 +368,6 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
         console.error("Error:", error);
         reject(error); // Rejette la promesse en cas d'erreur
       });
-    });
-  }
-
-
-
-
-
-
-
-
-  function blobToDataURL(blob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
     });
   }
 
@@ -374,15 +415,15 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
     }
   }
  
-  function handleRotateChange() {
-    const rotateInput = document.getElementById("rotate-input")
-    const value = Math.min(180, Math.max(-180, Number(rotateInput.value)));
-    setRotate(value);
-    console.log("coucou")
-  }
+  
 
   return (
-    <div className="Crop flex justify-center ">
+    <div className="Crop  flex justify-center" >
+      <div className="loadDiv" style={{ display: load ? 'flex' : 'none'}} id={load ? 'visible' : ''}>
+      {load && (
+        <Loader />
+      )}
+      </div>
       <container className="flex justify-evenly p-4 bg-neutral-100">
       {/* {!isSelectVisible && (
                 <button onClick={() => setIsSelectVisible(true)}>Crop</button>
@@ -404,8 +445,9 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
             aspectOptions={aspectOptions}
             newWidth={newWidth}
             newHeight={newHeight}
-            handleRotateChange={handleRotateChange}
-        />
+            mirrorY={mirrorY}
+            
+                    />
       <section className="flex">
       {!!imgSrc && (
         
@@ -425,7 +467,7 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
               src={imgSrc}
               style={imageStyle}
               onLoad={onImageLoad}
-              onChange={onImageLoad}
+              // onChange={onImageLoad}
               id="imageCanvas"
             />
           </ReactCrop>
