@@ -28,10 +28,11 @@ function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
     mediaWidth,
     mediaHeight
   );
+  
 }
 
 
-export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, setIsSelectVisible, isSelectVisible, load, setLoad}) {
+export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSrc, fileName, setIsSelectVisible, isSelectVisible, load, setLoad}) {
   
   const previewCanvasRef = useRef(null);
   const imgRef = useRef(null);
@@ -52,8 +53,9 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
   const [mirrorY, setMirrorY] = useState("0")
   const [scaleFlipX, setScaleFlipX] = useState()
   const [scaleFlipY, setScaleFlipY] = useState()
-  
-  
+  const [cropLoading, setCropLoading] = useState(true);
+
+
 
   const toggleSepia = () => {
     
@@ -107,9 +109,11 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
   ];
 
   function onImageLoad(e) {
+    
     setBaseWidth(imgRef.current.naturalWidth)
     setBaseHeight(imgRef.current.naturalHeight)
-    
+    mirroringImageX()
+    mirroringImageX()
     if (aspect) {
       const { width, height } = e.currentTarget;
       setCrop(centerAspectCrop(width, height, aspect));
@@ -128,7 +132,10 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
         rotate
       );
     }
+    setLoad(false)
+    setScaleFlipY(1)
   }
+
   function defautInputs(){
     if(document.getElementById("b&wCheck").checked === true){
       document.getElementById("b&wCheck").checked = false;
@@ -165,17 +172,10 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
       setNewWidth(Math.round((crop.width / 100) * baseWidth))
       setNewHeight(Math.round((crop.height / 100) * baseHeight))
     }
-    
+    setLoad(false)
   },[crop])
 
-  useEffect(() =>{
   
-    if (mirrorY === "1" && rotate !== 0) {
-      setRotate(-rotate)
-    }
-    
-    
-  },[load])
   
   
 
@@ -415,16 +415,18 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
     }
   }
  
-  
+   // Make sure this runs only once
 
+  
   return (
+    <>
     <div className="Crop  flex justify-center" >
       <div className="loadDiv" style={{ display: load ? 'flex' : 'none'}} id={load ? 'visible' : ''}>
       {load && (
         <Loader />
       )}
       </div>
-      <container className="flex justify-evenly p-4 bg-neutral-100">
+      <container className="flex rounded-lg justify-evenly p-4 bg-neutral-200">
       {/* {!isSelectVisible && (
                 <button onClick={() => setIsSelectVisible(true)}>Crop</button>
             )}
@@ -489,8 +491,7 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
             />
           </div> }
           
-          <div>
-            <button onClick={makeChanges}>Download Crop</button> 
+          <div> 
             {/* <div style={{ fontSize: 12, color: "#666" }}>
               You need to open the CodeSandbox preview in a new window (top
               right icon) as security restrictions prevent the download
@@ -510,19 +511,14 @@ export default function CropImage({onCropChange, imgSrc, setImgSrc, fileName, se
           </div>
         </>
       )}
-          <div className="absolute bottom-0 right-1/3 mb-3 mr-5">
-              <label>Width:</label>
-
-              <span>{newWidth}</span>
-          </div>
-          <div className="absolute right-0 top-1/2 p-8">
-              <label>Height:</label>
-          
-              <span>{newHeight}</span>
-          </div>
         </section>
       </container>
+      
     </div>
+    <div class="flex items-center justify-center w-screen">
+      <button onClick={makeChanges} className='my-5 w-40 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Download Crop</button>
+    </div>
+    </>
   );
 }
 

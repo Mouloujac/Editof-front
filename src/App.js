@@ -1,5 +1,5 @@
 // App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CropImage from './components/Crop/CropImage.js';
 import FileSelect from './components/FileSelect/FileSelect.js';
 import Title from './components/Title/Title.js';
@@ -7,11 +7,13 @@ import TitleCrop from './components/Title/TitleCrop.js';
 import Loader from './components/Loader/Loader.js';
 
 function App() {
-    const [imgSrc, setImgSrc] = useState("");
-    const [isSelectVisible, setIsSelectVisible] = useState(true)
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [fileName, setFileName] = useState("");
-    const [load, setLoad] = useState(false)
+  const [isLoading, setLoading] = useState(true);
+  const [imgSrc, setImgSrc] = useState("");
+  const [isSelectVisible, setIsSelectVisible] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [fileName, setFileName] = useState("");
+  const [load, setLoad] = useState(false);
+  
 
     function onSelectFile(e) {
         if (e.target.files && e.target.files.length > 0) {
@@ -26,6 +28,8 @@ function App() {
             const fileName = uploadedFile.name;
             setFileName(`${fileName.replace(/\.[^/.]+$/, '')}_modified.jpg`)
             setIsSelectVisible(false)
+            setSelectedImage("1")
+            test()
         }
         
     }
@@ -45,31 +49,61 @@ function App() {
             setIsSelectVisible(false)
         }
     }
+    function someRequest() {
+        // Simulates a request; makes a "promise" that'll run for 2.5 seconds
+        return new Promise(resolve => setTimeout(() => resolve(), 2500));
+    }
+    
+    useEffect(() => {
+        someRequest().then(() => {
+            setLoading(false);
+        });
+    }, []); // Make sure this runs only once
 
-    return (
+    function test(){
+        setLoad(true)
+        someRequest().then(() => {
+            
+            console.log('useEffect')
+        });
+    };
+  
+
+    if (isLoading) {
+        return (
+            <div className="App">
+            
+            <Loader />
+            </div>
+        );
+    }
+    
+      return (
         <div className="App flex flex-col">
-            <header className="App-header">
-            
-            </header>
-            
-                <>
-                {isSelectVisible && (
-                    <section className='flex flex-col'>
-                    <Title />
-                    <FileSelect onSelectFile={onSelectFile} onFileDrop={handleFileDrop}  />
-                    </section>
-                )}
-                    {!!imgSrc && (
-                        <>
-                            <TitleCrop />
-                            <CropImage setLoad={setLoad} load={load} imgSrc={imgSrc} setImgSrc={setImgSrc} isSelectVisible={isSelectVisible} setIsSelectVisible={setIsSelectVisible} selectedImage={selectedImage} setSelectedImage={setSelectedImage} fileName={fileName}/>
-                        </>
-                    )}
-                    </>
-            
-            
+          <header className="App-header">
+            {/* Your existing header content */}
+          </header>
+          <div className="loadDivE" style={{ display: load ? 'flex' : 'none'}} id={load ? 'visible' : ''}>
+      {load && (
+        <Loader />
+      )}
+      </div>
+          {isSelectVisible && (
+            <section className='flex flex-col'>
+              <Title />
+              <FileSelect onSelectFile={onSelectFile} onFileDrop={handleFileDrop} />
+            </section>
+          )}
+          
+          {!!imgSrc && (
+            <div className={`CropImageContainer ${load ? 'loading' : ''}`}>
+              {load && <Loader />}
+              <TitleCrop />
+              <CropImage setLoad={setLoad} load={load} imgSrc={imgSrc} setImgSrc={setImgSrc} isSelectVisible={isSelectVisible} setIsSelectVisible={setIsSelectVisible} selectedImage={selectedImage} setSelectedImage={setSelectedImage} fileName={fileName} />
+            </div>
+          )}
         </div>
-    );
-}
-
-export default App;
+      );
+    }
+    
+    export default App;
