@@ -19,3 +19,8 @@
     transition: opacity 0.5s ease-in-out; 
     opacity: 1;
 }
+
+#imageCanvas{
+    transform: scale(1), scaleX(1), scaleY(1), rotate(0deg);
+    max-height: 80vh;
+  }

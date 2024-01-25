@@ -19,9 +19,10 @@ function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
     makeAspectCrop(
       {
         unit: "%",
-        width: 97,
+        width: 100,
+        height: 100,
       },
-      aspect,
+      100/100,
       mediaWidth,
       mediaHeight
     ),
@@ -51,10 +52,19 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
   const [newHeight, setNewHeight] = useState("")
   const [mirrorX, setMirrorX] = useState("0")
   const [mirrorY, setMirrorY] = useState("0")
-  const [scaleFlipX, setScaleFlipX] = useState()
-  const [scaleFlipY, setScaleFlipY] = useState()
+  const [scaleFlipX, setScaleFlipX] = useState(1)
+  const [scaleFlipY, setScaleFlipY] = useState(1)
   const [cropLoading, setCropLoading] = useState(true);
+  const delay = (milliseconds) => new Promise(resolve => setTimeout(resolve, milliseconds));
 
+  const exampleFunction = async () => {
+    console.log('Start');
+    await delay(4000);
+    console.log('After 2 seconds');
+    setLoad(false)
+  };
+  
+  
 
 
   const toggleSepia = () => {
@@ -112,15 +122,14 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
     
     setBaseWidth(imgRef.current.naturalWidth)
     setBaseHeight(imgRef.current.naturalHeight)
-    mirroringImageX()
-    mirroringImageX()
+   
     if (aspect) {
       const { width, height } = e.currentTarget;
       setCrop(centerAspectCrop(width, height, aspect));
     }else{
       setAspect(undefined)
       const { width, height } = e.currentTarget;
-      setCrop(centerAspectCrop(width, height, 3/2));
+      setCrop(centerAspectCrop(width, height, undefined));
     }
     
     if (previewCanvasRef.current && completedCrop) {
@@ -132,8 +141,9 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
         rotate
       );
     }
-    setLoad(false)
-    setScaleFlipY(1)
+    exampleFunction();
+    document.querySelector('.ReactCrop__child-wrapper').style.height = '100%';
+    document.querySelector('.ReactCrop__child-wrapper').style.display = 'inline-block';
   }
 
   function defautInputs(){
@@ -269,19 +279,20 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
     setBaseWidth(imgRef.current.naturalWidth);
     setBaseHeight(imgRef.current.naturalHeight);
 
-  
-    if (mirrorY === "1" && rotate !== 0) {
-      if (rotate > 0) {
+    if(mirrorY === "1" || mirrorX === "1" ){
+     if (mirrorY === "1" && rotate !== 0) {
+        if (rotate > 0) {
         setRotate(-rotate);
-      } else if (rotate < 0) {
-        setRotate(Math.abs(rotate));
-      }
-    }else if(mirrorX === "1" && rotate !== 0){
-      if (rotate > 0) {
-        setRotate(-rotate);
-      } else if (rotate < 0) {
-        setRotate(Math.abs(rotate));
-      }
+        } else if (rotate < 0) {
+          setRotate(Math.abs(rotate));
+        }
+      }else if(mirrorX === "1" && rotate !== 0){
+        if (rotate > 0) {
+          setRotate(-rotate);
+        } else if (rotate < 0) {
+          setRotate(Math.abs(rotate));
+        }
+    }
     }
 
     const image = document.getElementById("imageCanvas");
@@ -420,13 +431,13 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
   
   return (
     <>
-    <div className="Crop  flex justify-center" >
+    <div className="Crop w-full h-screen flex justify-center align-center " >
       <div className="loadDiv" style={{ display: load ? 'flex' : 'none'}} id={load ? 'visible' : ''}>
       {load && (
         <Loader />
       )}
       </div>
-      <container className="flex rounded-lg justify-evenly p-4 bg-neutral-200">
+      <container className="flex  h-full w-full align-center justify-evenly p-12 bg-neutral-700">
       {/* {!isSelectVisible && (
                 <button onClick={() => setIsSelectVisible(true)}>Crop</button>
             )}
@@ -450,7 +461,8 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
             mirrorY={mirrorY}
             
                     />
-      <section className="flex">
+      <section className="max-h-[80vh] p-3 pb-5 w-[900px] bg-neutral-900 inline-block flex-col">
+        <div className="max-h-[80vh] overflow-hidden inline-block flex flex-col m-auto">
       {!!imgSrc && (
         
           <ReactCrop
@@ -459,9 +471,10 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
             onComplete={(c) => setCompletedCrop(c)}
             aspect={aspect}
             style={{
-              width: "800px",
+              display:"inline-block"
             }}
-            
+              
+            className="m-auto"
           >
             <img
               ref={imgRef}
@@ -471,6 +484,7 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
               onLoad={onImageLoad}
               // onChange={onImageLoad}
               id="imageCanvas"
+              className="m-auto max-h-96"
             />
           </ReactCrop>
         
@@ -480,6 +494,7 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
         <>
           { <div>
             <canvas
+            className=""
               ref={previewCanvasRef}
               style={{
                 border: "1px solid black",
@@ -511,13 +526,17 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
           </div>
         </>
       )}
+      </div>
+        <div class="flex items-center justify-center ">
+          <button onClick={makeChanges} className='my-5 w-40 text-white bg-blue-700 hover:bg-blue-800 bottom-0 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Download Crop</button>
+        </div>
+        
         </section>
+        
       </container>
       
     </div>
-    <div class="flex items-center justify-center w-screen">
-      <button onClick={makeChanges} className='my-5 w-40 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Download Crop</button>
-    </div>
+    
     </>
   );
 }

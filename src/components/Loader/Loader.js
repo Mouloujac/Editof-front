@@ -8,6 +8,12 @@ export default function Loader({}) {
     
     
     return (
-        <div class="loader"><img src="logo.jpg"></img></div>
+        <div className="loader-container">
+            <div className="loader rounded-lg">
+                
+                <img src="logoEditofOpacity.png"></img>
+                
+            </div>
+        </div>
     );
 }

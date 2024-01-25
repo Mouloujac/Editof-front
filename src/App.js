@@ -1,10 +1,14 @@
 // App.js
+import "./App.css";
+
 import React, { useState, useEffect } from 'react';
 import CropImage from './components/Crop/CropImage.js';
 import FileSelect from './components/FileSelect/FileSelect.js';
 import Title from './components/Title/Title.js';
 import TitleCrop from './components/Title/TitleCrop.js';
 import Loader from './components/Loader/Loader.js';
+import "./Fonts/Nunito-VariableFont_wght.ttf"
+import "./Fonts/Syne-VariableFont_wght.ttf"
 
 function App() {
   const [isLoading, setLoading] = useState(true);
@@ -79,15 +83,15 @@ function App() {
     }
     
       return (
-        <div className="App flex flex-col">
+        <div className="App flex h-screen bg-neutral-800 justify-center align-center flex-col h-full">
           <header className="App-header">
-            {/* Your existing header content */}
+            
           </header>
-          <div className="loadDivE" style={{ display: load ? 'flex' : 'none'}} id={load ? 'visible' : ''}>
-      {load && (
-        <Loader />
-      )}
-      </div>
+          
+            {load && (
+              <Loader />
+            )}
+          
           {isSelectVisible && (
             <section className='flex flex-col'>
               <Title />
@@ -96,11 +100,9 @@ function App() {
           )}
           
           {!!imgSrc && (
-            <div className={`CropImageContainer ${load ? 'loading' : ''}`}>
-              {load && <Loader />}
-              <TitleCrop />
+            <>
               <CropImage setLoad={setLoad} load={load} imgSrc={imgSrc} setImgSrc={setImgSrc} isSelectVisible={isSelectVisible} setIsSelectVisible={setIsSelectVisible} selectedImage={selectedImage} setSelectedImage={setSelectedImage} fileName={fileName} />
-            </div>
+            </>
           )}
         </div>
       );

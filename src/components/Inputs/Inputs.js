@@ -26,22 +26,22 @@ export default function Inputs({
     
     return (
         <section className="inputSection">
-            <div className="Crop-Controls p-3 h-full flex flex-col space-y-8">
-                <div className="flex flex-col space-y-3">
-                    <label htmlFor="rotate-input">Mirroring: </label>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input onClick={() => mirroringImageY()} type="checkbox" value="" class="sr-only peer"  id="mirrorInputY"/>
-                        <div class="w-11 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                        <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Toggle Y</span>
+            <div className="Crop-Controls px-3 h-full flex flex-col space-y-5 text-white">
+                <div className="flex flex-col space-y-3 bg-neutral-800 p-4 rounded-lg ">
+                    <label htmlFor="rotate-input " className="text-white"><p>Mirroring: </p></label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input onClick={() => mirroringImageY()} type="checkbox" value="" className="sr-only peer"  id="mirrorInputY"/>
+                        <div className="w-11 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        <span className="ms-3 text-sm font-medium  text-white"><p>Toggle Y</p></span>
                     </label>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input onClick={() => mirroringImageX()} type="checkbox" value="" class="sr-only peer" id="mirrorInputX"/>
-                        <div class="w-11 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                        <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Toggle X</span>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input onClick={() => mirroringImageX()} type="checkbox" value="" className="sr-only peer" id="mirrorInputX"/>
+                        <div className="w-11 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        <span className="ms-3 text-sm font-medium  text-white"><p>Toggle X</p></span>
                     </label>
                 </div>
-                <div className="flex flex-col">
-                    <label htmlFor="rotate-input">Rotate: </label>
+                <div className="flex flex-col bg-neutral-800 p-4 rounded-lg">
+                    <label htmlFor="rotate-input" className="pb-2"><p>Rotate:</p> </label>
                     <input
                         id="rotate-input"
                         type="number"
@@ -51,9 +51,10 @@ export default function Inputs({
                         setRotate(Math.min(180, Math.max(-180, Number(e.target.value))))}
                     />
                 </div>
-                <div>
-                    <label htmlFor="scale-input">Scale: </label>
+                <div className="bg-neutral-800 p-4 rounded-lg flex flex-col">
+                    <label htmlFor="scale-input" className="pb-2"><p>Scale:</p> </label>
                     <input
+                    
                     id="scale-input"
                     type="range"
                     step="0.1"
@@ -64,21 +65,21 @@ export default function Inputs({
                     />
                     <span>{scale.toFixed(1)}</span> 
                 </div>
-                <div className="flex flex-col space-y-3">
-                <label htmlFor="scale-input">Color change: </label>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input onClick={() => toggleSepia()} type="checkbox" value="" class="sr-only peer" id="sepiaCheck"/>
-                        <div class="w-11 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                        <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Toggle Sepia</span>
+                <div className="flex flex-col space-y-3 bg-neutral-800 p-4 rounded-lg">
+                <label htmlFor="scale-input"><p>Color change:</p> </label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input onClick={() => toggleSepia()} type="checkbox" value="" className="sr-only peer" id="sepiaCheck"/>
+                        <div className="w-11 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        <span className="ms-3 text-sm font-medium  "><p>Toggle Sepia</p></span>
                     </label>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input onClick={() => toggleBlackAndWhite()} type="checkbox" value="" class="sr-only peer" id="b&wCheck"/>
-                        <div class="w-11 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                        <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Toggle B&W</span>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input onClick={() => toggleBlackAndWhite()} type="checkbox" value="" className="sr-only peer" id="b&wCheck"/>
+                        <div className="w-11 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        <span className="ms-3 text-sm font-medium  "><p>Toggle B&W</p></span>
                     </label>
                 </div>
-                <div className="flex flex-col">
-                    <label htmlFor="aspectSelect">Aspect Ratio:</label>
+                <div className="flex flex-col bg-neutral-800 p-4 rounded-lg">
+                    <label htmlFor="aspectSelect" className="pb-2"><p>Aspect Ratio:</p></label>
                     <select
                         id="aspectSelect"
                         value={aspect || ""}

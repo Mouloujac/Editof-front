@@ -9,6 +9,17 @@
     inherits: false;
     syntax: '<number>';
   }
+
+  .loader-container{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+
   .loader {
     
     box-sizing: border-box;
@@ -16,6 +27,7 @@
     font-weight: bold;
     color: #151313;
     border-style: solid;
+    z-index: 999;
     border-width: 1vmin;
     font-size: 2rem;
     --charge: hsl(var(--h, 0), 80%, 50%);
