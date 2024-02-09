@@ -54,7 +54,6 @@ function App() {
         }
     }
     function someRequest() {
-        // Simulates a request; makes a "promise" that'll run for 2.5 seconds
         return new Promise(resolve => setTimeout(() => resolve(), 2500));
     }
     
@@ -62,12 +61,11 @@ function App() {
         someRequest().then(() => {
             setLoading(false);
         });
-    }, []); // Make sure this runs only once
+    }, []); 
 
     function test(){
         setLoad(true)
         someRequest().then(() => {
-            
             console.log('useEffect')
         });
     };
@@ -83,7 +81,7 @@ function App() {
     }
     
       return (
-        <div className="App flex h-screen bg-neutral-800 justify-center align-center flex-col h-full">
+        <div className="App flex h-screen bg-neutral-800 justify-center align-center flex-col h-full text-base">
           <header className="App-header">
             
           </header>
@@ -101,6 +99,7 @@ function App() {
           
           {!!imgSrc && (
             <>
+            
               <CropImage setLoad={setLoad} load={load} imgSrc={imgSrc} setImgSrc={setImgSrc} isSelectVisible={isSelectVisible} setIsSelectVisible={setIsSelectVisible} selectedImage={selectedImage} setSelectedImage={setSelectedImage} fileName={fileName} />
             </>
           )}

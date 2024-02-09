@@ -6,7 +6,7 @@
     z-index: 999;
     background-color: #282c34;
     box-sizing: border-box;
-    background: white;
+    background: rgb(48, 47, 47);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,7 +17,7 @@
 #visible {
     /* Displayed state with fade-in effect */
     transition: opacity 0.5s ease-in-out; 
-    opacity: 1;
+    opacity: 0.8;
 }
 
 #imageCanvas{

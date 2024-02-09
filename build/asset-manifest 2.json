@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/static/css/main.425d45a8.css",
+    "main.js": "/static/js/main.8f33d0bd.js",
+    "static/js/787.678fdc57.chunk.js": "/static/js/787.678fdc57.chunk.js",
+    "static/media/Nunito-VariableFont_wght.ttf": "/static/media/Nunito-VariableFont_wght.c0f0807a40aebdc41b40.ttf",
+    "static/media/Syne-VariableFont_wght.ttf": "/static/media/Syne-VariableFont_wght.738f6bde408f8ddf7106.ttf",
+    "index.html": "/index.html",
+    "main.425d45a8.css.map": "/static/css/main.425d45a8.css.map",
+    "main.8f33d0bd.js.map": "/static/js/main.8f33d0bd.js.map",
+    "787.678fdc57.chunk.js.map": "/static/js/787.678fdc57.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.425d45a8.css",
+    "static/js/main.8f33d0bd.js"
+  ]
+}

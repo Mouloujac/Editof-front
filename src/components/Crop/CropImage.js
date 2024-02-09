@@ -13,6 +13,7 @@ import Inputs from "../Inputs/Inputs";
 import axios from "axios";
 import Loader from "../Loader/Loader";
 import "./CropImage.css";
+import Title from "../Title/Title";
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
   return centerCrop(
@@ -20,9 +21,9 @@ function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
       {
         unit: "%",
         width: 100,
-        height: 100,
+        height: 100
       },
-      100/100,
+      aspect,
       mediaWidth,
       mediaHeight
     ),
@@ -127,10 +128,11 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
       const { width, height } = e.currentTarget;
       setCrop(centerAspectCrop(width, height, aspect));
     }else{
-      setAspect(undefined)
+      setAspect(4/4)
       const { width, height } = e.currentTarget;
       setCrop(centerAspectCrop(width, height, undefined));
     }
+    console.log(aspect)
     
     if (previewCanvasRef.current && completedCrop) {
       canvasPreview(
@@ -142,8 +144,7 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
       );
     }
     exampleFunction();
-    document.querySelector('.ReactCrop__child-wrapper').style.height = '100%';
-    document.querySelector('.ReactCrop__child-wrapper').style.display = 'inline-block';
+  
   }
 
   function defautInputs(){
@@ -247,19 +248,25 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
     if (filterRoute === null && mirrorX === "0" && mirrorY === "0"){
       try {
         
-        onDownloadCropClick(); // Attend que onDownloadCropClick soit terminé
-        // Reste du code
+        onDownloadCropClick(); 
+
       } catch (error) {
         console.error("Error:", error);
       }
     }else{
       try {
-        await colorChange(); // Attend que colorChange soit terminé
+        await colorChange();
         
         sleep(2000).then(() => {
-          onDownloadCropClick();
+          onDownloadCropClick()
+          .then(() => {
+            setLoad(false)         
+          })
+          .catch((erreur) => {
+            console.error("Loader probleme :", erreur);
+          });
         });
-        // Reste du code
+
       } catch (error) {
         console.error("Error:", error);
       }
@@ -338,12 +345,12 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
     hiddenAnchorRef.current.click();
     
     defautInputs()
-    setLoad(false)
+    
 
   }
   
 
-
+  
 
   function colorChange() {
     const filterRoute = isSepia ? "applySepia" :
@@ -356,19 +363,21 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
     const base64Image = imageSrc.split(",")[1];
   
     return new Promise((resolve, reject) => {
-      axios.post(`http://localhost:8000/${filterRoute}`, {
+      axios.post(`https://editof.netlify.app/.netlify/functions/${filterRoute}`, {
         imageData: base64Image,
         mirrorX: mirrorX,
         mirrorY: mirrorY,
       }, {
+        headers: {
+          'Content-Type': 'application/json', 
+        },
         responseType: 'blob',
       })
       .then(response => {
         const reader = new FileReader();
         reader.addEventListener("load", () => {
           setImgSrc(reader.result?.toString() || "");
-          
-           // Résoud la promesse une fois que tout est terminé
+     
         });
         reader.readAsDataURL(response.data);
         
@@ -377,7 +386,7 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
       
       .catch(error => {
         console.error("Error:", error);
-        reject(error); // Rejette la promesse en cas d'erreur
+        reject(error);
       });
     });
   }
@@ -425,19 +434,20 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
       }
     }
   }
- 
-   // Make sure this runs only once
 
-  
   return (
-    <>
+    <div className="">
+        <img src="logoEditofOpacity.png" className="w-28 mt-12 absolute desktop:hidden ml-[38%]"></img>
+
     <div className="Crop w-full h-screen flex justify-center align-center " >
       <div className="loadDiv" style={{ display: load ? 'flex' : 'none'}} id={load ? 'visible' : ''}>
       {load && (
         <Loader />
       )}
       </div>
-      <container className="flex  h-full w-full align-center justify-evenly p-12 bg-neutral-700">
+      
+      <section className="md:container  flex h-full w-full align-center justify-evenly p-12 bg-neutral-700 items-center">
+      
       {/* {!isSelectVisible && (
                 <button onClick={() => setIsSelectVisible(true)}>Crop</button>
             )}
@@ -459,10 +469,10 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
             newWidth={newWidth}
             newHeight={newHeight}
             mirrorY={mirrorY}
-            
+            makeChanges={makeChanges}
                     />
-      <section className="max-h-[80vh] p-3 pb-5 w-[900px] bg-neutral-900 inline-block flex-col">
-        <div className="max-h-[80vh] overflow-hidden inline-block flex flex-col m-auto">
+      <section className="h-[80vh] pb-5 max-w-[900px] md:mt-[-100px] inline-block flex flex-col justify-center items-center">
+        <div className="h-full overflow-hidden inline-block flex flex-col m-auto ">
       {!!imgSrc && (
         
           <ReactCrop
@@ -527,17 +537,17 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
         </>
       )}
       </div>
-        <div class="flex items-center justify-center ">
-          <button onClick={makeChanges} className='my-5 w-40 text-white bg-blue-700 hover:bg-blue-800 bottom-0 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Download Crop</button>
-        </div>
+      <div class="flex items-center justify-center absolute desktop:bottom-8 md:bottom-5">
+        <button onClick={makeChanges} className='my-5 w-40 text-white bg-blue-700 hover:bg-blue-800 bottom-0 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Download Crop</button>
+      </div>  
         
         </section>
-        
-      </container>
+       
+      </section>
       
     </div>
     
-    </>
+    </div>
   );
 }
 
