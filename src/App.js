@@ -9,8 +9,6 @@ import Loader from './components/Loader/Loader.js';
 import "./Fonts/Nunito-VariableFont_wght.ttf"
 import "./Fonts/Syne-VariableFont_wght.ttf"
 
-
-
 function App() {
   const [isLoading, setLoading] = useState(true);
   const [imgSrc, setImgSrc] = useState("");
