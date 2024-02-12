@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import ReactCrop, {
   centerCrop,
   makeAspectCrop,
-  Crop,
-  PixelCrop,
   convertToPixelCrop,
 } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -13,7 +11,6 @@ import Inputs from "../Inputs/Inputs";
 import axios from "axios";
 import Loader from "../Loader/Loader";
 import "./CropImage.css";
-import Title from "../Title/Title";
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
   return centerCrop(
@@ -55,7 +52,6 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
   const [mirrorY, setMirrorY] = useState("0")
   const [scaleFlipX, setScaleFlipX] = useState(1)
   const [scaleFlipY, setScaleFlipY] = useState(1)
-  const [cropLoading, setCropLoading] = useState(true);
   const delay = (milliseconds) => new Promise(resolve => setTimeout(resolve, milliseconds));
 
   const exampleFunction = async () => {
@@ -172,8 +168,6 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
   }
 
   useEffect(() =>{
-    const image = imgRef.current;
-    const { width, height } = imgRef.current;
     // console.log("manualheight="+manualHeight)
     // if (mirrorY === "1" && rotate !== 0) {
     //   setRotate(-rotate)
@@ -437,7 +431,7 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
 
   return (
     <div className="">
-        <img src="logoEditofOpacity.png" className="w-28 mt-12 absolute desktop:hidden ml-[38%]"></img>
+        <img src="logoEditofOpacity.png" alt="logo" className="w-28 mt-12 absolute desktop:hidden ml-[38%]"></img>
 
     <div className="Crop w-full h-screen flex justify-center align-center " >
       <div className="loadDiv" style={{ display: load ? 'flex' : 'none'}} id={load ? 'visible' : ''}>

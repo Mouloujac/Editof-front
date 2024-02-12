@@ -23,7 +23,7 @@ export default function FileSelect({ onSelectFile, onFileDrop }) {
             <button 
                 onClick={handleButtonClick}
                 className='bg-blue-500 hover:bg-blue-600 p-2 flex text-white space-x-1 w-36 justify-center self-center mb-2'
-            ><img src="file-search.svg" className="pr-1"></img>Choose File</button>
+            ><img src="file-search.svg" alt='fileSearch' className="pr-1"></img>Choose File</button>
             
             <div className="hidden">
                 <input 

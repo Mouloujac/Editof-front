@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 import CropImage from './components/Crop/CropImage.js';
 import FileSelect from './components/FileSelect/FileSelect.js';
 import Title from './components/Title/Title.js';
-import TitleCrop from './components/Title/TitleCrop.js';
 import Loader from './components/Loader/Loader.js';
 import "./Fonts/Nunito-VariableFont_wght.ttf"
 import "./Fonts/Syne-VariableFont_wght.ttf"

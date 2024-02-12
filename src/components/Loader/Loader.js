@@ -1,8 +1,8 @@
 // FileSelect.js
-import React, { useRef } from "react";
+import React from "react";
 import "./Loader.css"
 
-export default function Loader({}) {
+export default function Loader() {
 
     
     
@@ -11,7 +11,7 @@ export default function Loader({}) {
         <div className="loader-container">
             <div className="loader rounded-lg">
                 
-                <img src="logoEditofOpacity.png"></img>
+                <img src="logoEditofOpacity.png" alt='logo'></img>
                 
             </div>
         </div>

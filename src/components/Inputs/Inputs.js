@@ -1,5 +1,5 @@
 // FileSelect.js
-import React, { useRef } from "react";
+import React from "react";
 
 export default function Inputs({ 
     mirroringImageX,
@@ -50,7 +50,7 @@ export default function Inputs({
             <div className="Crop-Controls px-3 h-full md:h-44 md:py-8 md:absolute md:bottom-2 md:z-50 md:justify-evenly md:w-full md:flex md:flex desktop:space-y-0 text-white">
             
                 <div className="md:flex">
-                    <input unchecked type="checkbox" id="mirrorCheck" className="peer appearance-none z-50 sm:w-12 sm:h-12 "></input><img className="md:absolute md:w-10 md:ml-[0.2rem] md:mt-[0.3rem] desktop:hidden" src="mirrorIcon.svg"></img>
+                    <input unchecked type="checkbox" id="mirrorCheck" className="peer appearance-none z-50 sm:w-12 sm:h-12 "></input><img alt='icons'className="md:absolute md:w-10 md:ml-[0.2rem] md:mt-[0.3rem] desktop:hidden" src="mirrorIcon.svg"></img>
                     
                     <container className="container md:m-auto md:w-48 md:peer-checked:flex md:peer-checked:absolute md:bottom-44 md:left-[23.5%] md:peer-checked:absolute sm:hidden  2xl:relative z-50 desktop:flex flex-col space-y-3 bg-neutral-800 p-4 rounded-lg ">
                         <label htmlFor="rotate-input " className="text-white">Mirroring:</label>
@@ -68,7 +68,7 @@ export default function Inputs({
                     </container>
                 </div>
                 <div className="md:flex">
-                    <input unchecked type="checkbox" id="mirrorCheck" className="peer appearance-none sm:w-12 sm:h-12 z-50"></input><img className="md:absolute md:w-10 md:ml-[0.2rem] md:mt-[0.3rem] desktop:hidden" src="rotateIcon.svg"></img>
+                    <input unchecked type="checkbox" id="mirrorCheck" className="peer appearance-none sm:w-12 sm:h-12 z-50"></input><img alt='icons'className="md:absolute md:w-10 md:ml-[0.2rem] md:mt-[0.3rem] desktop:hidden" src="rotateIcon.svg"></img>
                     <div className="container md:m-auto md:w-48 md:peer-checked:flex md:peer-checked:absolute md:bottom-44 md:left-[23.5%] md:peer-checked:absolute sm:hidden  lg:flex flex-col bg-neutral-800 space-y-3 p-4 rounded-lg">
                         <label htmlFor="rotate-input" className=""><p>Rotate:</p> </label>
                         <input
@@ -83,7 +83,7 @@ export default function Inputs({
                     </div>
                 </div>
                 <div className="md:flex">
-                <input unchecked type="checkbox" id="mirrorCheck" className="peer appearance-none sm:w-12 sm:h-12 z-50"></input><img className="md:absolute md:w-10 md:ml-[0.2rem] md:mt-[0.3rem] desktop:hidden" src="zoomIcon.svg"></img>
+                <input unchecked type="checkbox" id="mirrorCheck" className="peer appearance-none sm:w-12 sm:h-12 z-50"></input><img alt='icons'className="md:absolute md:w-10 md:ml-[0.2rem] md:mt-[0.3rem] desktop:hidden" src="zoomIcon.svg"></img>
                     <div className="container md:m-auto md:w-48 md:peer-checked:flex md:peer-checked:absolute md:bottom-44 md:left-[23.5%] md:peer-checked:absolute sm:hidden  lg:flex bg-neutral-800 p-4 rounded-lg flex flex-col">
                         <div className="flex flex-row justify-between">
 
@@ -105,7 +105,7 @@ export default function Inputs({
                     </div>
                 </div>
                 <div className="md:flex">
-                <input unchecked type="checkbox" id="mirrorCheck" className="peer appearance-none sm:w-12 sm:h-12 z-50"></input><img className="md:absolute md:w-10 md:ml-[0.2rem] md:mt-[0.3rem] desktop:hidden" src="colorIcon.svg"></img>
+                <input unchecked type="checkbox" id="mirrorCheck" className="peer appearance-none sm:w-12 sm:h-12 z-50"></input><img alt='icons'className="md:absolute md:w-10 md:ml-[0.2rem] md:mt-[0.3rem] desktop:hidden" src="colorIcon.svg"></img>
                     <div className="container md:m-auto md:w-48 md:peer-checked:flex md:peer-checked:absolute md:bottom-44 md:left-[23.5%] md:peer-checked:absolute sm:hidden desktop:flex flex-col space-y-3 bg-neutral-800 p-4 rounded-lg">
                         <label htmlFor="scale-input"><p>Color change:</p> </label>
                         <span className="bg-neutral-600 h-0.5 mb-2"></span>
@@ -123,7 +123,7 @@ export default function Inputs({
                     </div>
                 </div>  
                 <div className="md:flex">
-                <input unchecked type="checkbox" id="mirrorCheck" className="peer appearance-none sm:w-12 sm:h-12 z-50"></input><img className="md:absolute md:w-10 md:ml-[0.2rem] md:mt-[0.3rem] desktop:hidden" src="cardeIcon.svg"></img>
+                <input unchecked type="checkbox" id="mirrorCheck" className="peer appearance-none sm:w-12 sm:h-12 z-50"></input><img alt='icons'className="md:absolute md:w-10 md:ml-[0.2rem] md:mt-[0.3rem] desktop:hidden" src="cardeIcon.svg"></img>
                     <div className="container md:m-auto md:w-48 md:peer-checked:flex md:peer-checked:absolute md:bottom-44 md:left-[23.5%] md:peer-checked:absolute sm:hidden  desktop:flex flex-col bg-neutral-800 p-4 rounded-lg">
                         <label htmlFor="aspectSelect" className="pb-2"><p>Aspect Ratio:</p></label>
                         <select
