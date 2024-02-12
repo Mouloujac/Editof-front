@@ -355,40 +355,35 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
     const image = document.getElementById("imageCanvas");
     const imageSrc = image.src;
     const base64Image = imageSrc.split(",")[1];
-  
+    
     return new Promise((resolve, reject) => {
-      fetch(`https://editof.netlify.app/.netlify/functions/${filterRoute}`, {
-        method: 'POST',
+      axios.post(`https://editof.netlify.app/.netlify/functions/${filterRoute}`, {
+        imageData: base64Image,
+        mirrorX: mirrorX,
+        mirrorY: mirrorY,
+      }, {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', 
         },
-        body: JSON.stringify({
-          imageData: base64Image,
-          mirrorX: mirrorX,
-          mirrorY: mirrorY,
-        }),
+        responseType: 'blob',
       })
       .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.blob();
-      })
-      .then(blob => {
         const reader = new FileReader();
         reader.addEventListener("load", () => {
           setImgSrc(reader.result?.toString() || "");
-          resolve();
+     
         });
-        reader.readAsDataURL(blob);
+        reader.readAsDataURL(response.data);
+        
+        resolve();
       })
+      
       .catch(error => {
         console.error("Error:", error);
         reject(error);
       });
     });
   }
-  
 
   useDebounceEffect(
     () => {
