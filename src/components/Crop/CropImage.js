@@ -364,6 +364,7 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
       }, {
         headers: {
           'Content-Type': 'application/json', 
+          'Origin': 'https://editof.site' ,
         },
         responseType: 'blob',
       })
