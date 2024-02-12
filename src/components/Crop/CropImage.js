@@ -355,7 +355,7 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
     const image = document.getElementById("imageCanvas");
     const imageSrc = image.src;
     const base64Image = imageSrc.split(",")[1];
-    console.log(base64Image)
+    
     return new Promise((resolve, reject) => {
       axios.post(`https://editof.netlify.app/.netlify/functions/${filterRoute}`, {
         imageData: base64Image,
@@ -532,7 +532,7 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
       )}
       </div>
       <div class="flex items-center justify-center absolute desktop:bottom-8 md:bottom-5">
-        <button onClick={makeChanges} className='my-5 w-40 text-white bg-blue-700 hover:bg-blue-800 bottom-0 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Download Crop</button>
+        <button onClick={makeChanges} className='my-5 w-40 text-white bg-blue-700 hover:bg-blue-800 bottom-0 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Download Crop stp</button>
       </div>  
         
         </section>
