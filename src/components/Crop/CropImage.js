@@ -355,9 +355,7 @@ export default function CropImage({selectedImage, onCropChange, imgSrc, setImgSr
     const image = document.getElementById("imageCanvas");
     const imageSrc = image.src;
     const base64Image = imageSrc.split(",")[1];
-    console.log(base64Image)
-    console.log(mirrorX)
-    console.log(mirrorY)
+   
     return new Promise((resolve, reject) => {
       axios.post(`https://editof.netlify.app/.netlify/functions/${filterRoute}`, {
         imageData: base64Image,
